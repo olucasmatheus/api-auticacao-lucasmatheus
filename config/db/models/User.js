@@ -3,10 +3,10 @@ const mongoose = require('mongoose')
 const userSchema = new mongoose.Schema ({
     username: String, 
     password: String, 
-    email: String, unique: true,
+    email: {type: String, unique: true},
     name: String,
-    cpf: String, unique: true,
-    telefone: String, unique: true,
+    cpf: {type: String, unique: true},
+    telefone: {type: String, unique: true},
     endereco: String,
     cep: String,
     cidade: String,
