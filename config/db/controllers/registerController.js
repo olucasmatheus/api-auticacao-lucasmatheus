@@ -4,8 +4,8 @@ const saltRounds = 10;
 
 exports.deleteUser = async (req, res) => {
     try{
-        const user = await User.findByIdAndDelete(req.params.id);
-        if(!user) res.status(404).send("Nenhum usuário encontrado");
+        const user = await User.findOneAndDelete({username: req.body.username});
+        if(!user) res.status(404).send("Nenhum email encontrado");
             res.status(200).send("Usuário deletado com sucesso");
         } catch (error) {
             res.status(500).send(err);
@@ -13,14 +13,15 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.registerUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, email, cpf, telefone } = req.body;
 
     try {
         const hash = await bcrypt.hash(password, saltRounds);
 
-        const newUser = new User({ username, password: hash});
+        const newUser = new User({ username, password: hash, email, cpf, telefone});
         const userSave = await newUser.save();
 
+        // Retornar os campos mencionados
         res.json(userSave);
     } catch (err) {
         console.error(err);

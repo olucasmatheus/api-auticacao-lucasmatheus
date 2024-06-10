@@ -4,6 +4,7 @@ const app = express();
 const routesRegister = require('./config/db/routes/registerUsers');
 const routesLogin = require('./config/db/routes/loginUsers');
 const routesShow = require('./config/db/routes/showUsers');
+const routesDelete = require('./config/db/routes/DeleteUsers');
 require('./config/db/connection');
 
 app.use(bodyParser.json());
@@ -12,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/users', routesRegister);
 app.use('/login', routesLogin);
 app.use('/show', routesShow);
+app.use('/delete', routesDelete);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
