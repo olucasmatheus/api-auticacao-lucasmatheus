@@ -1,20 +1,27 @@
 const e = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('./../models/User');
+const validator = require('validator');
 const secretKey = require('./../../../jwt/autentication');
+
 exports.loginUser = async (req, res) => {
-    const {email, password} = req.body;
+    const {cpf, password} = req.body;
+
+    const cpfValido = cpf => {
+        const regex = /^[0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2}$/;
+        
+    }
 
     try {
-        console.log("encontrando user");
-        // Verificar se o usuário existe
-        const user = await User.findOne({email: email});
-        // Verificar se a senha está correta
-        console.log("usuario encontrado");
+        const user = await User.findOne({cpf: cpf});
         
         if(!user){
             return res.status(404).send("Usuário não encontrado");
         }
-        console.log("verificando senha");
+        
         const SenhaCorreta = await bcrypt.compare(password, user.password);
+
         if(!SenhaCorreta){
             return res.status(400).send("Senha incorreta");
         }
@@ -30,12 +37,12 @@ exports.loginUser = async (req, res) => {
                 }
             );
             res.json({
-            message: `Autenticado como ${email}!`,
+            message: `Autenticado como ${cpf}!`,
             auth: true,
             tokenAutenticacao
             })
         }
     } catch (err) {
-        return res.status(403).json({message: "Erro ao autenticar. Senha, email ou CPF incorretos."});
+        return res.status(403).json({message: "Erro ao autenticar. Senha ou CPF incorretos."});
     }
 }
