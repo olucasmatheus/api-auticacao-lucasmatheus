@@ -1,19 +1,35 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const validator = require('validator');
+const {cpfValido} = require('./../../db/validation/validator');
 
 exports.deleteUser = async (req, res) => {
     try{
         const user = await User.findOneAndDelete({username: req.body.username});
-        if(!user) res.status(404).send("Nenhum email encontrado");
+        if(!user) res.status(404).send("Nenhum usuário encontrado");
             res.status(200).send("Usuário deletado com sucesso");
-        } catch (error) {
+        } catch (err) {
             res.status(500).send(err);
     }
 }
 
 exports.registerUser = async (req, res) => {
-    const { username, password, email, cpf, telefone } = req.body;
+    const { username, password, email, cpf, telefone} = req.body;
+   
+    if(!cpfValido(cpf)){
+        return res.status(400).send("CPF inválido");
+    }
+
+    const usuarioExiste = await User.findOne({email: email, cpf: cpf, telefone: telefone});
+    try {
+        if(usuarioExiste){
+            return res.status(400).send("Usuário já existe");
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erro ao buscar usuário");
+    }
 
     try {
         const hash = await bcrypt.hash(password, saltRounds);
@@ -44,7 +60,13 @@ exports.showUser = async (req, res) => {
 
 exports.changeUser = async (req, res) => {
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true});
+        const token = req.headers.authorization;
+        const decoded = jwt.verify(token, secretKey);
+        if(decoded.body.username !== req.body.username){
+            return res.status(401).send("Você não tem permissão para alterar este usuário");
+        }
+
+        const user = await User.findOneAndUpdate({username: req.body.username}, req.body, {new: true});
         res.json(user);
     }
     catch (err) {

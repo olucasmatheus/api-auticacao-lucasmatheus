@@ -4,13 +4,13 @@ const jwt = require('jsonwebtoken');
 const User = require('./../models/User');
 const validator = require('validator');
 const secretKey = require('./../../../jwt/autentication');
+const {cpfValido} = require('./../../db/validation/validator');
 
 exports.loginUser = async (req, res) => {
     const {cpf, password} = req.body;
 
-    const cpfValido = cpf => {
-        const regex = /^[0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2}$/;
-        
+    if(!cpfValido(cpf)){
+        return res.status(400).send("CPF inválido");
     }
 
     try {
@@ -42,6 +42,8 @@ exports.loginUser = async (req, res) => {
             tokenAutenticacao
             })
         }
+
+        return true;
     } catch (err) {
         return res.status(403).json({message: "Erro ao autenticar. Senha ou CPF incorretos."});
     }
