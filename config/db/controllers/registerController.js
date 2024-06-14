@@ -1,8 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const validator = require('validator');
 const {cpfValido} = require('./../../db/validation/validator');
+const {emailValido} = require('../validation/validator');
 
 exports.deleteUser = async (req, res) => {
     try{
@@ -19,6 +19,10 @@ exports.registerUser = async (req, res) => {
    
     if(!cpfValido(cpf)){
         return res.status(400).send("CPF inválido");
+    }
+
+    if(!emailValido(email)){
+        return res.status(400).send("Email inválido");
     }
 
     const usuarioExiste = await User.findOne({email: email, cpf: cpf, telefone: telefone});
