@@ -4,9 +4,10 @@ const saltRounds = 10;
 const {cpfValido} = require('./../../db/validation/validator');
 const {emailValido} = require('../validation/validator');
 
+
 exports.deleteUser = async (req, res) => {
     try{
-        const user = await User.findOneAndDelete({username: req.body.username});
+        const user = await User.deleteMany({});
         if(!user) res.status(404).send("Nenhum usuário encontrado");
             res.status(200).send("Usuário deletado com sucesso");
         } catch (err) {
@@ -15,7 +16,7 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.registerUser = async (req, res) => {
-    const { username, password, email, cpf, telefone} = req.body;
+    const { username, password, email, cpf} = req.body;
    
     if(!cpfValido(cpf)){
         return res.status(400).send("CPF inválido");
@@ -25,7 +26,7 @@ exports.registerUser = async (req, res) => {
         return res.status(400).send("Email inválido");
     }
 
-    const usuarioExiste = await User.findOne({email: email, cpf: cpf, telefone: telefone});
+    const usuarioExiste = await User.findOne({email: email, cpf: cpf});
     try {
         if(usuarioExiste){
             return res.status(400).send("Usuário já existe");
@@ -38,7 +39,7 @@ exports.registerUser = async (req, res) => {
     try {
         const hash = await bcrypt.hash(password, saltRounds);
 
-        const newUser = new User({ username, password: hash, email, cpf, telefone});
+        const newUser = new User({ username, password: hash, email, cpf});
         const userSave = await newUser.save();
 
         // Retornar os campos mencionados

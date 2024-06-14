@@ -1,20 +1,19 @@
-const e = require('express');
+// const e = require('express'); 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('./../models/User');
-const validator = require('validator');
 const secretKey = require('./../../../jwt/autentication');
-const {cpfValido} = require('./../../db/validation/validator');
+
 
 exports.loginUser = async (req, res) => {
-    const {cpf, password} = req.body;
+    const {username, password} = req.body;
 
-    if(!cpfValido(cpf)){
-        return res.status(400).send("CPF inválido");
+    if(!username || !password){
+        return res.status(400).send("Preencha todos os campos");
     }
 
     try {
-        const user = await User.findOne({cpf: cpf});
+        const user = await User.findOne({username: username});
         
         if(!user){
             return res.status(404).send("Usuário não encontrado");
@@ -37,7 +36,7 @@ exports.loginUser = async (req, res) => {
                 }
             );
             res.json({
-            message: `Autenticado como ${cpf}!`,
+            message: `Autenticado como ${username}!`,
             auth: true,
             tokenAutenticacao
             })
@@ -45,6 +44,6 @@ exports.loginUser = async (req, res) => {
 
         return true;
     } catch (err) {
-        return res.status(403).json({message: "Erro ao autenticar. Senha ou CPF incorretos."});
+        return res.status(403).json({message: "Erro ao autenticar. Usuário ou senha incorreta."});
     }
 }

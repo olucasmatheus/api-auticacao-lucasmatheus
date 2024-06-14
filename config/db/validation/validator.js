@@ -62,10 +62,6 @@ exports.emailValido = email => {
     return validator.isEmail(email);
 }
 
-exports.telefoneValido = telefone => {
-    const regex = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
-    return validator.matches(telefone, regex);
-}
 
 
 
