@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const {cpfValido} = require('./../../db/validation/validator');
 const {emailValido} = require('../validation/validator');
+const {senhaForte} = require('../validation/validator');
 
 
 exports.deleteUser = async (req, res) => {
@@ -24,6 +25,10 @@ exports.registerUser = async (req, res) => {
 
     if(!emailValido(email)){
         return res.status(400).send("Email inválido");
+    }
+
+    if(!senhaForte(password)){
+        return res.status(400).send("Senha inválida. Verifique se a senha contém pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial.");
     }
 
     const usuarioExiste = await User.findOne({email: email, cpf: cpf});

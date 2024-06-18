@@ -53,13 +53,17 @@ exports.cpfValido = cpf => {
             return false;
         
         }
-
+    
         const regex = /^[0-9]{3}\.?[0-9]{3}\.?[0-9]{3}\-?[0-9]{2}$/;
         return validator.matches(cpf, regex);
 }
 
 exports.emailValido = email => {
     return validator.isEmail(email);
+}
+
+exports.senhaForte = password => {
+    return validator.isStrongPassword(password);
 }
 
 
