@@ -1,18 +1,63 @@
-const User = require('../models/User');
+const express = require('express');
 const bcrypt = require('bcrypt');
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const secretKey = require('../../../jwt/autentication');
 const saltRounds = 10;
 const {cpfValido} = require('./../../db/validation/validator');
 const {emailValido} = require('../validation/validator');
 const {senhaForte} = require('../validation/validator');
+const usuarioAutenticacao = require('../../../jwt/authUser')
 
+exports.loginUser = async (req, res) => {
+    const {username, password} = req.body;
+
+    if(!username || !password){
+        return res.status(400).send("Preencha todos os campos");
+    }
+
+    try {
+        const user = await User.findOne({username: username});
+        
+        if(!user){
+            return res.status(404).send("Usuário não encontrado");
+        }
+        
+        const SenhaCorreta = await bcrypt.compare(password, user.password);
+
+        if(!SenhaCorreta){
+            return res.status(400).send("Senha incorreta");
+        }
+        // Gerar token de autenticação
+        if(user && SenhaCorreta){
+            const tokenAutenticacao = usuarioAutenticacao(user._id);
+            res.json({
+            message: `Autenticado como ${username}!`,
+            auth: true,
+            tokenAutenticacao
+            })
+        }
+
+        return true;
+    } catch (err) {
+        return res.status(403).json({message: "Erro ao autenticar. Usuário ou senha incorreta."});
+    }
+}
 
 exports.deleteUser = async (req, res) => {
     try{
-        const user = await User.deleteMany({});
-        if(!user) res.status(404).send("Nenhum usuário encontrado");
+        const user = await User.deleteOne({username: req.body.username});
+        try {
+            if(!user){
+                return res.status(404).send("Usuário não encontrado");
+            }
             res.status(200).send("Usuário deletado com sucesso");
         } catch (err) {
-            res.status(500).send(err);
+            res.status(500).send("Erro ao deletar usuário");
+        }
+    }
+    catch (err) {
+        res.status(500).send("Erro ao deletar usuário");
     }
 }
 
