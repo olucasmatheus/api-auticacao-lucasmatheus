@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken')
 const secretKey = require('../jwt/autentication')
 
-function checkToken(userId){
+function gerarToken(userId){
     return jwt.sign(
         {
-            userId: user._id,
+            userId: userId,
         },
         secretKey,
         {
@@ -13,4 +13,4 @@ function checkToken(userId){
     )
 }
 
-module.exports = checkToken;
+module.exports = gerarToken;

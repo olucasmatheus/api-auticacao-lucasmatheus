@@ -5,7 +5,7 @@ const usuarioController = require('../controllers/userController')
 const tokenAutorizado = require('../../../jwt/userMiddleware')
 
 router
-    .post('/users', usuarioController.createUser)
+    .post('/users', usuarioController.registerUser)
     .post('/users/login', usuarioController.loginUser)
     .get('/users', tokenAutorizado, usuarioController.showUser)
     .patch('/users', tokenAutorizado, usuarioController.changeUser)

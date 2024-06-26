@@ -7,7 +7,7 @@ const saltRounds = 10;
 const {cpfValido} = require('./../../db/validation/validator');
 const {emailValido} = require('../validation/validator');
 const {senhaForte} = require('../validation/validator');
-const usuarioAutenticacao = require('../../../jwt/authUser')
+const gerarToken = require('../../../jwt/authUser')
 
 exports.loginUser = async (req, res) => {
     const {username, password} = req.body;
@@ -30,7 +30,7 @@ exports.loginUser = async (req, res) => {
         }
         // Gerar token de autenticação
         if(user && SenhaCorreta){
-            const tokenAutenticacao = usuarioAutenticacao(user._id);
+            const tokenAutenticacao = gerarToken(user._id);
             res.json({
             message: `Autenticado como ${username}!`,
             auth: true,
@@ -40,23 +40,19 @@ exports.loginUser = async (req, res) => {
 
         return true;
     } catch (err) {
-        return res.status(403).json({message: "Erro ao autenticar. Usuário ou senha incorreta."});
+        console.error("Erro ao autenticar:", err); // Logar erro no console
+        res.status(500).send("Erro ao autenticar usuário"); // Enviar mensagem de erro
     }
 }
 
 exports.deleteUser = async (req, res) => {
-    try{
-        const user = await User.deleteOne({username: req.body.username});
-        try {
-            if(!user){
-                return res.status(404).send("Usuário não encontrado");
-            }
-            res.status(200).send("Usuário deletado com sucesso");
-        } catch (err) {
-            res.status(500).send("Erro ao deletar usuário");
+    try {
+        const resultado = await User.deleteOne({username: req.body.username});
+        if(resultado.deletedCount === 0){
+            return res.status(404).send("Usuário não encontrado");
         }
-    }
-    catch (err) {
+        res.status(200).send("Usuário deletado");
+    } catch (err) {
         res.status(500).send("Erro ao deletar usuário");
     }
 }
@@ -101,16 +97,16 @@ exports.registerUser = async (req, res) => {
 }
 
 exports.showUser = async (req, res) => {
-    try{
+    try {
         const users = await User.find({});
-        if(!users){
-            res.status(404).send("Nenhum usuário encontrado");
-        } else{
-            res.status(200).send(users);
+        if(users.length === 0){
+            return res.status(404).send("Nenhum usuário encontrado");
+        } else {
+            res.json(users);
         }
     } catch (err) {
         res.status(500).send("Erro ao buscar usuários");
-}
+    }
 }
 
 exports.changeUser = async (req, res) => {

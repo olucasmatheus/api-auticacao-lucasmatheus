@@ -9,7 +9,7 @@ require('./config/db/connection');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/', autenticado, usuarioService);
+app.use('/', usuarioService);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
