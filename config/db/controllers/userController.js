@@ -58,7 +58,7 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.registerUser = async (req, res) => {
-    const { username, password, email, cpf} = req.body;
+    const { username, password, email, cpf, role} = req.body;
    
     if(!cpfValido(cpf)){
         return res.status(400).send("CPF inválido");
@@ -72,7 +72,7 @@ exports.registerUser = async (req, res) => {
         return res.status(400).send("Senha inválida. Verifique se a senha contém pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial.");
     }
 
-    const usuarioExiste = await User.findOne({email: email, cpf: cpf});
+    const usuarioExiste = await User.findOne({email: email, cpf: cpf, role});
     try {
         if(usuarioExiste){
             return res.status(400).send("Usuário já existe");
