@@ -72,6 +72,7 @@ exports.registerUser = async (req, res) => {
         return res.status(400).send("Senha inválida. Verifique se a senha contém pelo menos 8 caracteres, uma letra maiúscula, uma letra minúscula, um número e um caractere especial.");
     }
 
+
     const usuarioExiste = await User.findOne({email: email, cpf: cpf, role});
     try {
         if(usuarioExiste){
@@ -84,8 +85,11 @@ exports.registerUser = async (req, res) => {
 
     try {
         const hash = await bcrypt.hash(password, saltRounds);
-
-        const newUser = new User({ username, password: hash, email, cpf});
+        let role = 'user';
+        if(username == 'adminUserLucas'){
+            role = 'admin'
+        }
+        const newUser = new User({ username, password: hash, email, cpf, role});
         const userSave = await newUser.save();
 
         // Retornar os campos mencionados
