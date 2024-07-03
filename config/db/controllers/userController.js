@@ -9,6 +9,7 @@ const {emailValido} = require('../validation/validator');
 const {senhaForte} = require('../validation/validator');
 const gerarToken = require('../../../jwt/authUser')
 
+
 exports.loginUser = async (req, res) => {
     const {username, password} = req.body;
 
@@ -47,7 +48,7 @@ exports.loginUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     try {
-        const resultado = await User.deleteOne({username: req.body.username});
+        const resultado = await User.findOneAndDelete({username: req.body.username});
         if(resultado.deletedCount === 0){
             return res.status(404).send("Usuário não encontrado");
         }
@@ -114,17 +115,17 @@ exports.showUser = async (req, res) => {
 }
 
 exports.changeUser = async (req, res) => {
-    try {
-        const token = req.headers.authorization;
-        const decoded = jwt.verify(token, secretKey);
-        if(decoded.body.username !== req.body.username){
-            return res.status(401).send("Você não tem permissão para alterar este usuário");
-        }
+    try{
+        const resultado = await User.findOneAndUpdate({username: req.body.username})
 
-        const user = await User.findOneAndUpdate({username: req.body.username}, req.body, {new: true});
-        res.json(user);
-    }
-    catch (err) {
-        res.status
+        if(resultado.matchedCount === 0){
+            return res.status(404).send("Usuário não encontrado")
+        }
+        if(resultado.modifiedCount === 0 ){
+            return res.status(404).send("Sem informações para atualizar")
+        }
+        res.status(200).send("Informações atualizadas")
+    } catch (err){
+        res.status(500).send("Erro ao atualizar informações")
     }
 }
