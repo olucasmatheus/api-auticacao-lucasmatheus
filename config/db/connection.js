@@ -1,3 +1,3 @@
 const mongoose = require('mongoose')
-mongoose.connect("mongodb://127.0.0.1/api-login")
+mongoose.connect("mongodb://root:example@mongoDB:27017")
 
