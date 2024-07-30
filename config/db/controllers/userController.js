@@ -48,10 +48,9 @@ exports.loginUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     try {
+        console.log("1")
         const resultado = await User.findOneAndDelete({username: req.body.username});
-        if(resultado.deletedCount === 0){
-            return res.status(404).send("Usuário não encontrado");
-        }
+        console.log("2")
         res.status(200).send("Usuário deletado");
     } catch (err) {
         res.status(500).send("Erro ao deletar usuário");
