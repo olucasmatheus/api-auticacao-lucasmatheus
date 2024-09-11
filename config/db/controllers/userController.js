@@ -18,7 +18,7 @@ exports.loginUser = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({username: username});
+        const user = await User.findOne({where: {username: username}});
         
         if(!user){
             return res.status(404).send("Usuário não encontrado");
@@ -49,7 +49,7 @@ exports.loginUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
     try {
         console.log("1")
-        const resultado = await User.findOneAndDelete({username: req.body.username});
+        const resultado = await User.destroy({where: {username: req.body.username}});
         console.log("2")
         res.status(200).send("Usuário deletado");
     } catch (err) {
@@ -73,7 +73,9 @@ exports.registerUser = async (req, res) => {
     }
 
 
-    const usuarioExiste = await User.findOne({email: email, cpf: cpf, role});
+    const usuarioExiste = await User.findOne({
+        where: {email: email, cpf: cpf, role:role}
+    });
     try {
         if(usuarioExiste){
             return res.status(400).send("Usuário já existe");
@@ -102,7 +104,7 @@ exports.registerUser = async (req, res) => {
 
 exports.showUser = async (req, res) => {
     try {
-        const users = await User.find({});
+        const users = await User.findAll({});
         if(users.length === 0){
             return res.status(404).send("Nenhum usuário encontrado");
         } else {
@@ -115,13 +117,12 @@ exports.showUser = async (req, res) => {
 
 exports.changeUser = async (req, res) => {
     try{
-        const resultado = await User.findOneAndUpdate({username: req.body.username})
+        const resultado = await User.update(updates, {
+            where: {username: username}
+        });
 
-        if(resultado.matchedCount === 0){
+        if(updateRows === 0){
             return res.status(404).send("Usuário não encontrado")
-        }
-        if(resultado.modifiedCount === 0 ){
-            return res.status(404).send("Sem informações para atualizar")
         }
         res.status(200).send("Informações atualizadas")
     } catch (err){

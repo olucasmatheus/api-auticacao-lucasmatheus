@@ -3,8 +3,15 @@ const bodyParser = require('body-parser');
 const app = express();
 const usuarioService = require('./config/db/routes/userRoute');
 const autenticado = require('./jwt/userMiddleware');
+const sequelize = require("./config/db/connection")
 
-require('./config/db/connection');
+sequelize.authenticate()
+.then(() => {
+    console.log("Conexão feita com sucesso");
+})
+.catch(err => {
+    console.error("Não foi possivel conectar:", err);
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
